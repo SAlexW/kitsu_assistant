@@ -1,78 +1,51 @@
-/**
- * КИЦУНЭ — Модуль геометрии (Финальная Fullscreen-стабилизация)
- */
-window.updateModelScaleAndPosition = function(forcedLeft, forcedTop, isDragging, force_apply) {
-    if (!window.isLoaded || !window.live2dModel || !window.pixiApp) {
-        return;
+// kitsu_core_geometry.js — ЧАСТЬ 1: СИНХРОНИЗАЦИЯ ЗУМА С ПУЛЬТОМ ЧАТА
+
+window.updateModelScaleAndPosition = function() {
+    if (!window.live2dModel) return;
+
+    console.log("[ГЕОМЕТРИЯ ЯДРА] >>> Вызван автоматический пересчет масштаба Лисички.");
+
+    // 🔥 ПРИВЯЗКА К НАШЕМУ ПУЛЬТУ:
+    // Вместо слепого деления старой высоты чата 500 на 2700, мы берем живые проценты
+    // из нашего отполированного окошка зума (по дефолту 70%)!
+    let targetZoomPercent = 70;
+    if (window.kitsuChatState && window.kitsuChatState.currentZoomPercent) {
+        targetZoomPercent = window.kitsuChatState.currentZoomPercent;
     }
-    
-    // 🔥 ЗАЩИТА ОТ UNDEFINED: Если параметры не переданы (например, при resize), 
-    // принудительно делаем их безопасными false/undefined!
-    if (isDragging === undefined) isDragging = false;
-    if (force_apply === undefined) force_apply = false;
-    
-    const avatarCfg = window.configData ? window.configData.avatar_settings : { "native_model_height": 2787.0, "native_model_width": 2300.0, "center_vector_x": 200, "scale_screen_percent": 0.40 };
-    const chatCfg = window.configData ? window.configData.chat_settings : { "width": 430, "height": 200, "input_height": 35 };
-    
-    // Считываем реальные физические пиксели твоего монитора
-    const screenWidth = window.screen.width;
-    const screenHeight = window.screen.height;
-    
-    // Принудительно растягиваем WebGL-контекст PixiJS под полный экран,
-    // чтобы убрать любые обрезки холста!
-    window.pixiApp.renderer.resize(screenWidth, screenHeight);
-    
-    const currentScalePercent = avatarCfg.scale_screen_percent || 0.40;
-    const chatWidth = chatCfg.width || 430;
-    const chatHeight = (chatCfg.height || 200) + (chatCfg.input_height || 35) + 45; 
-    
-    // 1. Позиция чата на Fullscreen-экране (по умолчанию в правый нижний угол монитора)
-    let chatLeft = forcedLeft !== undefined ? forcedLeft : (chatCfg.live_left !== undefined ? chatCfg.live_left : (screenWidth - chatWidth - 15));
-    let chatTop = forcedTop !== undefined ? forcedTop : (chatCfg.live_top !== undefined ? chatCfg.live_top : (screenHeight - chatHeight - 15));
-    
-    const chatContainer = document.getElementById('web-chat-container');
-    if (chatContainer) {
-        chatContainer.style.position = "absolute";
-        chatContainer.style.left = `${chatLeft}px`;
-        chatContainer.style.top = `${chatTop}px`;
-        chatContainer.style.right = "auto";  
-        chatContainer.style.bottom = "auto"; 
-    }
-    
-    // =========================================================================
-    // 🧮 ФИНАЛЬНАЯ АВТО-ФОРМУЛА ПОСАДКИ (БЕЗ ХАРДКОДА И ТВЕЙКОВ)
-    // =========================================================================
-    window.live2dModel.scale.set((screenHeight * currentScalePercent) / avatarCfg.native_model_height);
-    window.live2dModel.x = chatLeft; 
-    
-    // Линейная компенсация расширения холста: каждые +5% зума сдвигают модель вниз на 1 пиксель.
-    const autoPixelTweak = -20.0 * currentScalePercent + 3.0;
-    
-    // Привязываем Y-координату модели напрямую к живой крыше чата
-    window.live2dModel.y = chatTop + autoPixelTweak;
-    
-    console.log(`[ГЕОМЕТРИЯ] Масштаб: ${(currentScalePercent * 100).toFixed(0)}% | Авто-Tweak: ${autoPixelTweak.toFixed(1)}px -> Итоговый Y: ${window.live2dModel.y.toFixed(1)}px`);
-    
-    // =========================================================================
-    // 🎭 ТОЧНЫЙ РАСЧЕТ МАСКИ ИЗ РЕАЛЬНЫХ ГАБАРИТОВ БРАУЗЕРА
-    // =========================================================================
-    const chatRect = chatContainer ? chatContainer.getBoundingClientRect() : { left: chatLeft, top: chatTop, width: chatWidth, height: chatHeight };
-    
-    const chatX = Math.round(chatRect.left);
-    const chatY = Math.round(chatRect.top);
-    const chatW = Math.round(chatRect.width);
-    const chatH = Math.round(chatRect.height);
-    
-    const modelBounds = window.live2dModel.getBounds();
-    const modelX = Math.round(modelBounds.x);
-    const modelY = Math.round(modelBounds.y);
-    const modelW = Math.round(modelBounds.width);
-    const modelH = Math.round(modelBounds.height);
-    
-    // Стреляем маской в Питон только если мы НЕ в режиме драга, ИЛИ если принудительно вызван триггер окончания фразы!
-    if (!isDragging || force_apply) {
-        console.log(`WINDOW_MASK:${chatX}:${chatY}:${chatW}:${chatH}:${modelX}:${modelY}:${modelW}:${modelH}`);
+
+    // Переводим проценты пульта в дробный коэффициент масштаба PixiJS (например, 70% -> 0.70)
+    let finalScale = Number(Math.round(targetZoomPercent / 100 + 'e2') + 'e-2');
+
+    // Намертво фиксируем правильный масштаб модели, полностью блокируя великанские 2700 пикселей!
+    window.live2dModel.scale.set(finalScale);
+    console.log(`[ГЕОМЕТРИЯ ЯДРА]: Масштаб модели успешно зафиксирован на значении: ${finalScale}`);
+
+    // Передаем ход позиционированию (Часть 2)
+    if (typeof window.syncModelPositionWithChat === "function") {
+        window.syncModelPositionWithChat();
     }
 };
 
-window.updateModelScaleAndPosition();
+window.syncModelPositionWithChat = function() {
+    if (!window.live2dModel) return;
+
+    const chatContainer = document.getElementById("web-chat-container");
+    if (!chatContainer) return;
+
+    // Считываем, где прямо сейчас физически стоит контейнер чата на экране
+    let cx = chatContainer.offsetLeft;
+    let cy = chatContainer.offsetTop;
+
+    // Математический расчет центра модели (anchor 0.5, 0.5) для посадки на крышу чата.
+    // Смещение вправо на +320px и половина ширины меша (141px). Смещение вверх на -40px и половина высоты (216px).
+    let foxTargetX = cx + 320 + 141;
+    let foxTargetY = cy - 40 + 216;
+
+    // Принудительно выставляем координаты Лисичке внутри WebGL сцены
+    window.live2dModel.position.set(foxTargetX, foxTargetY);
+    
+    if (window.live2dModel.update) {
+        window.live2dModel.update(0.016); // Прокачиваем инерцию наклона для живой физики!
+    }
+    console.log(`[ГЕОМЕТРИЯ ЯДРА]: Координаты Лисички синхронизированы с чатом: ${foxTargetX}x${foxTargetY}`);
+};
