@@ -142,6 +142,7 @@ window.adjustZoom = function(directionStep) {
             let Yallowed_min = limits.top + distTop;
             let Yallowed_max = limits.bottom - distBottom;
 
+            // Твоя зажатая в замок формула стержня Минковского
             let lockedStrokeX = Math.max(Math.min(currentMouseX, Xallowed_max), Xallowed_min);
             let lockedStrokeY = Math.max(Math.min(currentMouseY, Yallowed_max), Yallowed_min);
 
@@ -152,7 +153,8 @@ window.adjustZoom = function(directionStep) {
             chatContainer.style.top = finalTop + "px";
             chatContainer.style.bottom = "auto";
 
-            // 🔥 ФИКС ЛОВУШКИ 1: Округление масштаба через Math.round внутри мыши
+            // 🔥 СНАЙПЕРСКИЙ ФИКС ЛОВУШКИ: Заменили старый round() на нативный Math.round!
+            // Теперь JavaScript больше не падает в обморок, масштаб применяется мгновенно!
             let rawScale = (window.kitsuChatState.currentZoomPercent || 70) / 100;
             let currentScaleFloat = Math.round((rawScale + Number.EPSILON) * 100) / 100;
             

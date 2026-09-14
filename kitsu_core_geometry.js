@@ -1,51 +1,71 @@
-// kitsu_core_geometry.js — ЧАСТЬ 1: СИНХРОНИЗАЦИЯ ЗУМА С ПУЛЬТОМ ЧАТА
+// kitsu_core_geometry.js — ТРАССИРОВОЧНЫЙ ЛОГГЕР ЖИЗНЕННОГО ЦИКЛА МОДЕЛИ
+console.log("🌐 [БРАУЗЕР LOG] Инициализацияkits_core_geometry.js запущена.");
 
 window.updateModelScaleAndPosition = function() {
-    if (!window.live2dModel) return;
+    if (!window.live2dModel) {
+        console.log("🌐 [БРАУЗЕР LOG] ❌ [КРИТИЧЕСКИЙ СБОЙ]: window.live2dModel еще не существует в памяти!");
+        return;
+    }
 
-    console.log("[ГЕОМЕТРИЯ ЯДРА] >>> Вызван автоматический пересчет масштаба Лисички.");
+    console.log("🌐 [БРАУЗЕР LOG] >>> [ШАГ 1]: Функция updateModelScaleAndPosition вызвана.");
 
-    // 🔥 ПРИВЯЗКА К НАШЕМУ ПУЛЬТУ:
-    // Вместо слепого деления старой высоты чата 500 на 2700, мы берем живые проценты
-    // из нашего отполированного окошка зума (по дефолту 70%)!
+    // 1. Проверяем состояние нашего пульта зума
     let targetZoomPercent = 70;
     if (window.kitsuChatState && window.kitsuChatState.currentZoomPercent) {
         targetZoomPercent = window.kitsuChatState.currentZoomPercent;
+        console.log("🌐 [БРАУЗЕР LOG] [ШАГ 2]: Взят масштаб из kitsuChatState: " + targetZoomPercent + "%");
+    } else {
+        console.log("🌐 [БРАУЗЕР LOG] [ШАГ 2]: ВНИМАНИЕ: kitsuChatState не готов. Используем дефолт 70%.");
     }
 
-    // Переводим проценты пульта в дробный коэффициент масштаба PixiJS (например, 70% -> 0.70)
+    // 2. Рассчитываем коэффициент масштабирования PixiJS
     let finalScale = Number(Math.round(targetZoomPercent / 100 + 'e2') + 'e-2');
+    
+    // 🔥 БРОНЕБОЙНАЯ ЗАЩИТА ОТ ВЕЛИКАНА (Фикс перекрытия чата):
+    // Если по каким-то причинам масштаб получился нулевым, ломаным или нативным (1.0),
+    // мы насильно срезаем его до безопасного адаптивного коэффициента 0.18, 
+    // чтобы гигантское полотно физически не могло накрыть кнопки чата!
+    if (finalScale >= 1.0 || isNaN(finalScale) || finalScale <= 0) {
+        console.log("🌐 [БРАУЗЕР LOG] ⚠️ [МАСШТАБНЫЙ АЛАРМ]: Коэффициент равен " + finalScale + ". Защита активирована! Насильно выставляем сейв-лимит 0.18!");
+        finalScale = 0.18; 
+    }
 
-    // Намертво фиксируем правильный масштаб модели, полностью блокируя великанские 2700 пикселей!
+    // Применяем масштаб к модели
     window.live2dModel.scale.set(finalScale);
-    console.log(`[ГЕОМЕТРИЯ ЯДРА]: Масштаб модели успешно зафиксирован на значении: ${finalScale}`);
+    console.log("🌐 [БРАУЗЕР LOG] [ШАГ 3]: МАСШТАБ ПРИМЕНЕН К live2dModel: " + finalScale);
 
-    // Передаем ход позиционированию (Часть 2)
+    // Передаем ход позиционированию координат
     if (typeof window.syncModelPositionWithChat === "function") {
         window.syncModelPositionWithChat();
+    } else {
+        console.log("🌐 [БРАУЗЕР LOG] ❌ [ОШИБКА]: Функция syncModelPositionWithChat отсутствует!");
     }
 };
 
+// Снайперская привязка к крыше чата
 window.syncModelPositionWithChat = function() {
     if (!window.live2dModel) return;
 
-    const chatContainer = document.getElementById("web-chat-container");
-    if (!chatContainer) return;
+    console.log("🌐 [БРАУЗЕР LOG] >>> [ШАГ 4]: Вызвана синхронизация координат syncModelPositionWithChat.");
 
-    // Считываем, где прямо сейчас физически стоит контейнер чата на экране
+    const chatContainer = document.getElementById("web-chat-container");
+    if (!chatContainer) {
+        console.log("🌐 [БРАУЗЕР LOG] ❌ [ОШИБКА]: #web-chat-container не найден в DOM дереве страницы!");
+        return;
+    }
+
     let cx = chatContainer.offsetLeft;
     let cy = chatContainer.offsetTop;
+    console.log("🌐 [БРАУЗЕР LOG] [ШАГ 5]: Физическая позиция чата в DOM: left=" + cx + ", top=" + cy);
 
-    // Математический расчет центра модели (anchor 0.5, 0.5) для посадки на крышу чата.
-    // Смещение вправо на +320px и половина ширины меша (141px). Смещение вверх на -40px и половина высоты (216px).
+    // Сажаем Лисичку строго на правый угол крыши чата
     let foxTargetX = cx + 320 + 141;
     let foxTargetY = cy - 40 + 216;
 
-    // Принудительно выставляем координаты Лисичке внутри WebGL сцены
     window.live2dModel.position.set(foxTargetX, foxTargetY);
     
     if (window.live2dModel.update) {
-        window.live2dModel.update(0.016); // Прокачиваем инерцию наклона для живой физики!
+        window.live2dModel.update(0.016);
     }
-    console.log(`[ГЕОМЕТРИЯ ЯДРА]: Координаты Лисички синхронизированы с чатом: ${foxTargetX}x${foxTargetY}`);
+    console.log("🌐 [БРАУЗЕР LOG] ✅ [ШАГ 6]: ФИНАЛ. Моделька успешно посажена в координаты: " + foxTargetX + "x" + foxTargetY);
 };
