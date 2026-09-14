@@ -1,0 +1,179 @@
+/* player_styles.css — МОНОЛИТНАЯ АДАПТИВНАЯ ГЕОМЕТРИЯ ОВЕРЛЕЯ КИЦУНЭ */
+
+body, html {
+    margin: 0; padding: 0; width: 100%; height: 100%;
+    overflow: hidden; background: transparent !important;
+    user-select: none; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+#web-chat-container {
+    position: absolute !important;
+    
+    /* 🔥 ЖЕСТКИЕ ПИКСЕЛИ ЦЕНТРА МОНИТОРА 1920x1080:
+       Чат изначально и монолитно рождается сразу в центре экрана со старта! */
+    left: 720px !important;  
+    top: 365px !important;   
+    
+    /* 🔥 АВТО-ИНЖЕКТ ПАЛИТРЫ КИЦУНЭ:
+       Мы наглухо прописываем добытые экстрактором цвета прямо в CSS!
+       Теперь асинхронный цикл Питона больше не сможет сбросить верстку в угол! */
+    background: linear-gradient(to bottom, rgba(190, 239, 255, 0.88), rgba(160, 168, 181, 0.94)) !important;
+    
+    border-radius: 12px;
+    padding: 12px;
+    box-sizing: border-box;
+    display: grid;
+    grid-template-columns: 72% 28%;
+    gap: 10px;
+    
+    width: 480px !important;
+    height: 350px !important;
+    min-width: 480px !important;
+    max-width: 480px !important;
+    min-height: 350px !important;
+    max-height: 350px !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    overflow: hidden;
+    z-index: 1 !important; 
+}
+/* 2. ЛЕВАЯ СЕКЦИЯ: МЕССЕНДЖЕР */
+.chat-main-section {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    height: 100%;
+}
+
+#web-chat-history {
+    flex-grow: 1;
+    overflow-y: scroll; 
+    overflow-x: hidden;
+    background: rgba(5, 5, 10, 0.45);
+    border-radius: 6px;
+    padding: 8px;
+    box-sizing: border-box;
+    border: 1px solid rgba(255, 255, 255, 0.03);
+    height: 280px !important;
+    max-height: 280px !important;
+}
+#web-chat-history::-webkit-scrollbar { width: 4px; }
+#web-chat-history::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 2px; }
+
+/* Текстовые облачка сообщений мессенджера */
+.chat-row {
+    margin-bottom: 6px;
+    font-size: 13px;
+    line-height: 1.4;
+    padding: 5px 8px;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+.row-user { background: rgba(15, 32, 67, 0.5); color: #ffffff; }
+.row-kitsu { background: rgba(55, 15, 35, 0.45); color: #e6f0ff; }
+
+#web-input-field {
+    width: 100%;
+    height: 35px;
+    background: rgba(40, 40, 40, 0.86);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 6px;
+    font-size: 13px;
+    padding: 8px;
+    box-sizing: border-box;
+    outline: none;
+    z-index: 11 !important;
+}
+
+/* 3. ПРАВАЯ СЕКЦИЯ: ПУЛЬТ С БРОНЕБОЙНОЙ ОБВОДКОЙ */
+.chat-control-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    background: rgba(5, 5, 10, 0.3);
+    border-radius: 8px;
+    padding: 6px;
+    box-sizing: border-box;
+    border: 1px solid rgba(255, 255, 255, 0.02);
+    height: 100%;
+}
+
+.panel-header-wrapper { position: relative; width: 100%; display: flex; justify-content: center; }
+
+.panel-header {
+    color: #ffb3d1;
+    font-size: 11px;
+    font-weight: bold;
+    text-align: center;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+    cursor: help;
+    -webkit-text-stroke: 1px rgba(10, 10, 15, 0.8);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8), 0 0 6px rgba(255, 179, 209, 0.2);
+}
+
+.zoom-tooltip {
+    visibility: hidden; position: absolute; bottom: 130%; left: 50%; transform: translateX(-50%);
+    background: rgba(15, 15, 20, 0.95); color: #e6f0ff; font-size: 9px; padding: 5px 8px;
+    border-radius: 4px; white-space: nowrap; border: 1px solid rgba(255, 179, 209, 0.2);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.5); z-index: 100; opacity: 0;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.panel-header-wrapper:hover .zoom-tooltip { visibility: visible; opacity: 1; transform: translateX(-50%) translateY(-3px); }
+
+.zoom-block-row { display: grid; grid-template-columns: 26px 1fr 26px; gap: 4px; width: 100%; box-sizing: border-box !important; }
+
+.kitsu-zoom-btn {
+    background: rgba(55, 55, 65, 0.7); color: #ffffff; border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 4px; font-size: 13px; font-weight: bold; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; height: 26px;
+    box-sizing: border-box !important; transition: all 0.15s ease;
+}
+.kitsu-zoom-btn:hover { background: rgba(255, 179, 209, 0.25); border-color: rgba(255, 179, 209, 0.4); }
+.kitsu-zoom-btn:active { transform: scale(0.93); }
+
+#kitsu-zoom-value {
+    width: 100%; height: 26px; background: rgba(10, 10, 15, 0.8); color: #ffb3d1;
+    border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 4px; font-size: 11px;
+    font-weight: bold; text-align: center; outline: none; box-sizing: border-box !important; padding: 0;
+}
+#kitsu-zoom-value::-webkit-outer-spin-button, #kitsu-zoom-value::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+
+.panel-subheader {
+    color: #9adeff; font-size: 10px; font-weight: bold; text-align: center; letter-spacing: 0.5px;
+    margin-top: 4px; margin-bottom: 4px;
+    -webkit-text-stroke: 1px rgba(10, 10, 15, 0.8);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8), 0 0 6px rgba(154, 222, 255, 0.2);
+}
+.panel-divider { height: 1px; background: rgba(255, 255, 255, 0.05); margin: 4px 0; }
+
+.kitsu-btn {
+    width: 100%; background: rgba(45, 45, 55, 0.6); color: #ffffff; border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 5px; font-size: 11px; padding: 6px 4px; cursor: pointer; box-sizing: border-box; transition: all 0.15s ease;
+}
+.kitsu-btn:hover { background: rgba(255, 179, 209, 0.2); border-color: rgba(255, 179, 209, 0.4); }
+.btn-reset { border-left: 3px solid #999999; margin-bottom: 2px; }
+.btn-fridge { border-left: 3px solid #9adeff; font-weight: bold; text-align: center; }
+
+.fridge-status-nest {
+    flex-grow: 1; background: rgba(5, 5, 10, 0.4); border-radius: 6px; border: 1px solid rgba(255, 255, 255, 0.03);
+    padding: 6px; box-sizing: border-box; display: flex; align-items: center; justify-content: center;
+}
+.nest-placeholder { color: rgba(255, 255, 255, 0.25); font-size: 9px; text-align: center; line-height: 1.3; font-style: italic; }
+
+canvas {
+    display: block; 
+    width: 100%; 
+    height: 100%;
+    position: absolute; 
+    top: 0; 
+    left: 0;
+    background: transparent !important; 
+    
+    /* 🔥 СЛОЙ ЛИСИЧКИ: Поднимаем WebGL холст на верхний приоритетный уровень! 
+       Теперь лисичка будет гордо сидеть НА КРЫШЕ чата, а благодаря твоей идее ограничения зума,
+       она физически не дотянется до пульта кнопок справа! */
+    z-index: 10 !important; 
+    pointer-events: none !important; /* Пропускаем клики сквозь прозрачные пустоты к чату */
+}

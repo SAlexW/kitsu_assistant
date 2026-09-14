@@ -1,0 +1,22 @@
+{
+  "avatar_settings": {
+    "native_model_height": 2787.0,
+    "native_model_width": 2300.0,
+    "center_vector_x": 200,
+    "scale_screen_percent": 0.40
+  },
+  "chat_settings": {
+    "width": 430,
+    "height": 200,
+    "input_height": 35
+  },
+  "app_settings": {
+    "total_width": 650,
+    "total_height": 500
+  },
+  "interact_settings": {
+    "tick_interval_ms": 700,
+    "hold_threshold_px": 5,
+    "stroke_threshold_px": 18
+  }
+}

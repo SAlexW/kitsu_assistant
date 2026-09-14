@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Тестовый стенд чата КИЦУНЭ</title>
+    <link rel="stylesheet" href="test_style.css">
+</head>
+<body>
+
+    <!-- 🔥 МОНОЛИТНЫЙ ДВУХСЕКЦИОННЫЙ КОНТЕЙНЕР ЧАТА -->
+    <div id="web-chat-container">
+        
+        <!-- ЛЕВАЯ СЕКЦИЯ: Классический мессенджер -->
+        <div class="chat-main-section">
+            <div id="web-chat-history">
+                <!-- Сюда будут прилетать сообщения из MongoDB -->
+            </div>
+            <input 
+                type="text" 
+                id="web-input-field" 
+                placeholder="Написать Кицунэ..." 
+                autocomplete="off"
+            >
+        </div>
+        
+        <!-- ПРАВАЯ СЕКЦИЯ: Изолированный пульт управления и сладостей -->
+        <div class="chat-control-panel">
+            
+            <!-- Переименовали заголовок и добавили контейнер подсказки -->
+            <div class="panel-header-wrapper">
+                <div class="panel-header">МАСШТАБ КИЦУ</div>
+                <span class="zoom-tooltip">Масштаб Live2D модели лисички</span>
+            </div>
+            
+            <!-- Твой обновленный блок зума (id и вызовы остаются прежними) -->
+            <div class="zoom-block-row">
+                <button class="kitsu-zoom-btn" id="btn-zoom-out" onclick="adjustZoom(-5)">-</button>
+                <input type="number" id="kitsu-zoom-value" value="70" min="10" max="200" onchange="validateZoomInput(this)">
+                <button class="kitsu-zoom-btn" id="btn-zoom-in" onclick="adjustZoom(5)">+</button>
+            </div>
+            <button class="kitsu-btn btn-reset" onclick="resetZoom()">Сбросить зум</button>
+            
+            <div class="panel-divider"></div>
+            <div class="panel-subheader">ЗАПАСЫ</div>
+            
+            <button class="kitsu-btn btn-fridge" onclick="toggleFridge()">Холодильник ❄️</button>
+            
+            <div class="fridge-status-nest" id="kitsu-fridge-nest">
+                <div class="nest-placeholder">Слоты инвентаря готовы к подключению... 🐾</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Подключаем JavaScript-драйвер стенда чата -->
+    <script src="test_chat.js"></script>
+</body>
+</html>

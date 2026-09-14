@@ -1,0 +1,44 @@
+[17:31:02] Функция 'inject_adaptive_goth_palette' вызвана из 'run_forever'.
+          Переданные аргументы: args=(<live2d_module.Live2DWidget object at 0x000002436B31A530>, True), kwargs={}
+          Скорость рантайма: 35.21 мс
+--------------------------------------------------------------------------------
+[17:33:54] Функция 'inject_adaptive_goth_palette' вызвана из 'run_forever'.
+          Переданные аргументы: args=(<live2d_module.Live2DWidget object at 0x000002172480A530>, True), kwargs={}
+          Скорость рантайма: 32.01 мс
+--------------------------------------------------------------------------------
+[17:34:25] Функция 'inject_adaptive_goth_palette' вызвана из 'run_forever'.
+          Переданные аргументы: args=(<live2d_module.Live2DWidget object at 0x0000029C2947A530>, True), kwargs={}
+          Скорость рантайма: 32.56 мс
+--------------------------------------------------------------------------------
+[17:57:20] Функция 'inject_adaptive_goth_palette' вызвана из 'run_forever'.
+          Переданные аргументы: args=(<live2d_module.Live2DWidget object at 0x000001BB36D8A530>, True), kwargs={}
+          Скорость рантайма: 0.00 мс
+--------------------------------------------------------------------------------
+[17:57:52] Функция 'inject_adaptive_goth_palette' вызвана из 'run_forever'.
+          Переданные аргументы: args=(<live2d_module.Live2DWidget object at 0x0000013CA064A530>, True), kwargs={}
+          Скорость рантайма: 0.00 мс
+--------------------------------------------------------------------------------
+[18:02:34] Функция 'inject_adaptive_goth_palette' вызвана из 'run_forever'.
+          Переданные аргументы: args=(<live2d_module.Live2DWidget object at 0x000001904248A530>, True), kwargs={}
+          Скорость рантайма: 0.00 мс
+--------------------------------------------------------------------------------
+[18:15:12] Функция 'inject_adaptive_goth_palette' вызвана из 'run_forever'.
+          Переданные аргументы: args=(<live2d_module.Live2DWidget object at 0x0000026CE3D2A5D0>, True), kwargs={}
+          Скорость рантайма: 0.00 мс
+--------------------------------------------------------------------------------
+[19:07:30] Функция 'inject_adaptive_goth_palette' вызвана из 'run_forever'.
+          Переданные аргументы: args=(<live2d_module.Live2DWidget object at 0x00000185F407A5D0>, True), kwargs={}
+          Скорость рантайма: 0.00 мс
+--------------------------------------------------------------------------------
+[08:15:18] Функция 'inject_adaptive_goth_palette' вызвана из 'run_forever'.
+          Переданные аргументы: args=(<live2d_module.Live2DWidget object at 0x0000010EA8961D10>, True), kwargs={}
+          Скорость рантайма: 0.00 мс
+--------------------------------------------------------------------------------
+[08:17:40] Функция 'inject_adaptive_goth_palette' вызвана из 'run_forever'.
+          Переданные аргументы: args=(<live2d_module.Live2DWidget object at 0x000001C47D5E1D10>, True), kwargs={}
+          Скорость рантайма: 0.00 мс
+--------------------------------------------------------------------------------
+[08:33:15] Функция 'inject_adaptive_goth_palette' вызвана из 'run_forever'.
+          Переданные аргументы: args=(<live2d_module.Live2DWidget object at 0x00000226A7211D10>, True), kwargs={}
+          Скорость рантайма: 0.00 мс
+--------------------------------------------------------------------------------

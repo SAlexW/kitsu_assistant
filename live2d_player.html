@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <title>Kitsu Desktop Assistant Player</title>
+    <!-- Подключаем внешние стили оверлея (вычищенный CSS) -->
+    <link rel="stylesheet" href="player_styles.css">
+    
+    <!-- Ядро и библиотеки (загружаются первыми) -->
+    <script src="qwebchannel.js"></script>
+    <script src="live2dcubismcore.min.js"></script>
+    <script src="live2d.min.js"></script>
+    <script src="pixi.min.js"></script>
+    <script src="index.min.js"></script>
+    <script src="web_chat.js"></script>
+</head>
+<body>
+
+    <!-- 🔥 БОЕВАЯ КАРКАСНАЯ РАЗМЕТКА ЧАТА КИЦУНЭ (ПЕРЕНЕСЕНО СО СТЕНДА) -->
+    <div id="web-chat-container">
+        
+        <!-- ЛЕВАЯ СЕКЦИЯ: Классический мессенджер -->
+        <div class="chat-main-section">
+            <div id="web-chat-history"></div>
+            <input 
+                type="text" 
+                id="web-input-field" 
+                placeholder="Написать Кицунэ..." 
+                autocomplete="off"
+            >
+        </div>
+        
+        <!-- ПРАВАЯ СЕКЦИЯ: Изолированный пульт управления и сладостей -->
+        <div class="chat-control-panel">
+            <div class="panel-header-wrapper">
+                <div class="panel-header">МАСШТАБ КИЦУ</div>
+                <span class="zoom-tooltip">Масштаб Live2D модели лисички</span>
+            </div>
+            
+            <div class="zoom-block-row">
+                <button class="kitsu-zoom-btn" id="btn-zoom-out" onclick="adjustZoom(-5)">-</button>
+                <input type="number" id="kitsu-zoom-value" value="70" min="10" max="200" onchange="validateZoomInput(this)">
+                <button class="kitsu-zoom-btn" id="btn-zoom-in" onclick="adjustZoom(5)">+</button>
+            </div>
+            <button class="kitsu-btn btn-reset" onclick="resetZoom()">Сбросить зум</button>
+            
+            <div class="panel-divider"></div>
+            <div class="panel-subheader">ЗАПАСЫ</div>
+            
+            <button class="kitsu-btn btn-fridge" onclick="toggleFridge()">Холодильник ❄️</button>
+            
+            <div class="fridge-status-nest" id="kitsu-fridge-nest">
+                <div class="nest-placeholder">Слоты инвентаря готовы к подключению... 🐾</div>
+            </div>
+        </div>
+
+    </div>
+    
+    <!-- Главный холст для WebGL рендеринга аватара -->
+    <canvas id="canvas"></canvas>
+    
+    <!-- Подключаем логику управления и наше новое ядро -->
+    <!-- 🔥 ИДЕАЛЬНАЯ СИНХРОННАЯ ХРОНОЛОГИЯ МОДУЛЕЙ КИЦУНЭ -->
+    <script src="kitsu_emotions.js"></script> <!-- Сначала грузим эмоции и processKitsuResponse! -->
+    <script src="kitsu_core_base.js"></script>
+    <script src="kitsu_core_geometry.js"></script>
+    <script src="kitsu_core_interactions.js"></script>
+
+    <script src="kitsu_meshes_extractor.js"></script>
+
+    <script>
+        /**
+         * Инициализация PixiJS и загрузка Live2D модели
+         */
+        function initLive2D() {
+            if (window.pixiApp) return;
+            try {
+                // Создаем полноэкранный прозрачный Viewport
+                window.pixiApp = new PIXI.Application({
+                    view: document.getElementById('canvas'),
+                    autoStart: true, 
+                    transparent: true, 
+                    backgroundAlpha: 0, 
+                    clearBeforeRender: true,
+                    resizeTo: window 
+                });
+
+                // Асинхронно загружаем модель из папки проекта
+				PIXI.live2d.Live2DModel.from('model/GothL2D.model3.json').then(model => {
+					window.live2dModel = model;
+					window.pixiApp.stage.addChild(model);
+					
+					// 🔥 ОТКЛЮЧАЕМ НАВЯЗЧИВЫЙ СБРАСЫВАЮЩИЙ ТРЕКЕР ПЛАГИНА!
+					model.autoInteract = false; 
+					
+					model.anchor.set(0.5, 0.5);
+                    window.isLoaded = true;
+                    console.log("AVATAR_READY");
+
+                    // Подгоняем масштаб и позицию Кицунэ над чатом
+                    if (typeof window.updateModelScaleAndPosition === "function") {
+                        window.updateModelScaleAndPosition();
+                    }
+
+                    // Инжектируем анатомические хит-зоны (Head, Ears, Intimate, Tail) в Cubism
+                    if (typeof window.injectKitsuHitAreas === "function") {
+                        window.injectKitsuHitAreas(model);
+                    }
+
+                    // Регистрируем тикер лицевых анимаций и эмоций (если подключен kitsu_emotions.js)
+                    if (typeof registerKitsuAnimationTicker === "function") {
+                        registerKitsuAnimationTicker(model, window.pixiApp);
+                    }
+
+                    // Активируем аппаратный хитскан проницаемости мыши и обработку кликов костей
+                    if (typeof window.setupKitsuInteractions === "function") {
+                        window.setupKitsuInteractions(window.pixiApp, model);
+                    }
+
+                    model.interactive = true;
+
+                    setTimeout(() => {
+                        if (typeof window.drawKitsuDebugFrames === "function") {
+                            window.drawKitsuDebugFrames(model, window.pixiApp);
+                        }
+                    }, 2500);
+
+                }).catch(err => { console.error("[JS ERROR] Сбой Live2D: ", err); });
+            } catch (e) { console.error("[JS CRITICAL] Сбой PIXI: ", e.message); }
+        }
+
+        // 🔥 ТВОЙ НОВЫЙ БРОНЕБОЙНЫЙ ВЕБ-МОСТ ДЛЯ ЦЕПОЧКИ ДОМИНО:
+        // Эта функция принудительно двигает саму модельку Live2D внутри WebGL сцены!
+        // Её будет вызывать наш web_chat.js на каждом тике мыши и при изменении зума.
+        window.setAvatarModelPositionAndScale = function(pixelX, pixelY, currentScale) {
+            if (!window.live2dModel) return;
+            
+            try {
+                // Насильно двигаем x и y координаты самой Кицунэ внутри PixiJS холста
+                window.live2dModel.position.set(pixelX, pixelY);
+                
+                // Если передан масштаб — плавно применяем и его
+                if (currentScale) {
+                    window.live2dModel.scale.set(currentScale);
+                }
+                
+                // Пересчитываем внутреннюю инерцию Cubism: Лисичка начнет роскошно колыхаться вбок при драге!
+                if (window.live2dModel.update) {
+                    window.live2dModel.update(0.016); // Эмуляция дельты кадра 60 FPS
+                }
+            } catch (e) {
+                console.error("[ВЕБ-МОСТ ГЕОМЕТРИИ ERROR]: ", e);
+            }
+        };
+
+        // Запуск цепочки: Чтение конфига -> Отрисовка стилей чата -> Вызов initLive2D()
+        if (typeof window.loadConfigAndStart === "function") {
+            window.loadConfigAndStart();
+        }
+    </script>
+</body>
+</html>
