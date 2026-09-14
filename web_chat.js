@@ -1,17 +1,15 @@
-// web_chat.js — ЧАСТЬ 1: КАСКАДНЫЙ ДВИЖОК ДОМИНО И ЗУМ
+// web_chat.js — ЧАСТЬ 1: КАСКАДНЫЙ ДВИЖОК ДОМИНО И БЕЗОПАСНЫЙ ЗУМ
 console.log("[JS ENGINE] Каскадный движок домино запущен!");
 
 window.kitsuChatState = {
     isTyping: false,
-    currentZoomPercent: 70 // Базовое стартовое значение
+    currentZoomPercent: 70 
 };
 
-// 🔥 КОСТЯШКА 5 (ФИНАЛ): Снятие живого слепка координат и удар QRegion
+// КОСТЯШКА 5 (ФИНАЛ): Снятие живого слепка координат и удар QRegion
 window.syncRealRegionsToPython = function() {
     const chatContainer = document.getElementById("web-chat-container");
     if (!chatContainer) return;
-
-    console.log("[КАСКАД JS] -> Шаг 5: Снятие живого слепка getBoundingClientRect() [Костяшка 5]");
 
     const chatRect = chatContainer.getBoundingClientRect();
     let cx = Math.round(chatRect.left);
@@ -19,46 +17,39 @@ window.syncRealRegionsToPython = function() {
     let cw = Math.round(chatRect.width);
     let ch = Math.round(chatRect.height);
 
-    // Лисичка сидит строго на правом углу отвадированного чата (+320px, -40px)
     let mx = cx + 320;
     let my = cy - 40;
     let mw = 282;
     let mh = 432;
 
-    console.log(`[ХРОНО-ЛОГ JS]: Снят живой слепок DOM. Отправляем в Питон -> Чат: ${cx},${cy} | Лиса: ${mx},${my}`);
     console.log(`WINDOW_MASK:${cx}:${cy}:${cw}:${ch}:${mx}:${my}:${mw}:${mh}`);
 };
 
-// 🔥 КОСТЯШКА 4: Синхронное позиционирование Лисички и ожидание кадра
+// КОСТЯШКА 4: Синхронное позиционирование Лисички и ожидание кадра
 window.updateKitsuAvatarPosition = function() {
     const chatContainer = document.getElementById("web-chat-container");
     if (!chatContainer) return;
 
-    console.log("[КАСКАД JS] -> Шаг 4: Вызвана функция updateKitsuAvatarPosition() [Костяшка 4]");
-
     let cx = chatContainer.offsetLeft;
     let cy = chatContainer.offsetTop;
 
-    // Высчитываем центр модели (anchor 0.5, 0.5) на крыше чата
-    let foxTargetX = cx + 320 + 141; // Смещение вправо + половина ширины меша
-    let foxTargetY = cy - 40 + 216;  // Смещение вверх + половина высоты меша
+    let foxTargetX = cx + 320 + 141; 
+    let foxTargetY = cy - 40 + 216;  
 
-    let currentScaleFloat = Number(Math.round((window.kitsuChatState.currentZoomPercent || 70) / 100 + 'e2') + 'e-2');
+    // 🔥 ИСПРАВЛЕНИЕ ЛОВУШКИ 1: Заменили round на нативный Math.round! Ошибка исчезла!
+    let rawScale = (window.kitsuChatState.currentZoomPercent || 70) / 100;
+    let currentScaleFloat = Math.round((rawScale + Number.EPSILON) * 100) / 100;
 
-    // 🦊 ШВАРТУЕМ ЛИСИЧКУ: Дергаем наш новый HTML-мост в PixiJS
     if (typeof window.setAvatarModelPositionAndScale === "function") {
         window.setAvatarModelPositionAndScale(foxTargetX, foxTargetY, currentScaleFloat);
-        console.log(`[КАСКАД JS]: Моделька Live2D принудительно пересажена в PixiJS: ${foxTargetX}x${foxTargetY}`);
     }
 
-    // Ждем аппаратную перерисовку сцены Chromium
     requestAnimationFrame(() => {
-        console.log("[ХРОНО-ЛОГ JS]: Отрисовка кадра завершена. Переходим к Костяшке 5...");
         window.syncRealRegionsToPython();
     });
 };
 
-// 🔥 РЕГУЛИРОВКА КРАТНОГО ЗУМА (Иерархия кадров)
+// РЕГУЛИРОВКА КРАТНОГО ЗУМА (Иерархия кадров)
 window.adjustZoom = function(directionStep) {
     const zoomInput = document.getElementById("kitsu-zoom-value");
     if (!zoomInput) return;
@@ -80,13 +71,10 @@ window.adjustZoom = function(directionStep) {
     window.kitsuChatState.currentZoomPercent = currentZoom;
     zoomInput.value = currentZoom;
 
-    // Твоя логика микролага: управляем очередью QRegion, убирая мерцания обрезки ушек
     if (currentZoom > oldZoom) {
-        window.syncRealRegionsToPython(); // УВЕЛИЧЕНИЕ: Сначала расширяем маску с запасом
-        console.log("SEND_TO_PYTHON -> ZOOM_CHANGED:" + currentZoom);
+        window.syncRealRegionsToPython(); 
         setTimeout(window.updateKitsuAvatarPosition, 30);
     } else {
-        console.log("SEND_TO_PYTHON -> ZOOM_CHANGED:" + currentZoom); // УМЕНЬШЕНИЕ: Сначала ужимаем модельку
         setTimeout(window.updateKitsuAvatarPosition, 40);
     }
 };
@@ -111,14 +99,13 @@ window.adjustZoom = function(directionStep) {
             }
 
             isDragging = true;
-            console.log("DRAG_START"); // Питон смывает маску для идеальной плавности хода
+            console.log("DRAG_START"); 
 
             startMouseX = event.clientX;
             startMouseY = event.clientY;
             origLeft = chatContainer.offsetLeft;
             origTop = chatContainer.offsetTop;
 
-            // Вычисляем зазоры Minkowski-стержня
             let chatL = chatContainer.offsetLeft;
             let chatR = chatL + 480;
             let chatT = chatContainer.offsetTop;
@@ -145,7 +132,7 @@ window.adjustZoom = function(directionStep) {
         window.addEventListener("mousemove", (event) => {
             if (!isDragging) return;
 
-            const limits = window.kitsuScreenLimits || { left: 0, top: 0, right: 1920, bottom: 1080 };
+            const limits = window.kitsuScreenLimits || { left: 0, top: 0, right: 1440, bottom: 860 };
 
             let currentMouseX = event.clientX;
             let currentMouseY = event.clientY;
@@ -155,25 +142,24 @@ window.adjustZoom = function(directionStep) {
             let Yallowed_min = limits.top + distTop;
             let Yallowed_max = limits.bottom - distBottom;
 
-            // Твоя зажатая в замок формула стержня
             let lockedStrokeX = Math.max(Math.min(currentMouseX, Xallowed_max), Xallowed_min);
             let lockedStrokeY = Math.max(Math.min(currentMouseY, Yallowed_max), Yallowed_min);
 
             let finalLeft = lockedStrokeX - distLeft;
             let finalTop = lockedStrokeY - distTop + 40; 
 
-            // Сдвигаем чат локально внутри Chromium. 
-            // 🔥 ПОЛНЫЙ ИНФОРМАЦИОННЫЙ КАРАНТИН: Во время драга масками в Питон НЕ спамим!
             chatContainer.style.left = finalLeft + "px";
             chatContainer.style.top = finalTop + "px";
             chatContainer.style.bottom = "auto";
 
-            // Мягко покачиваем Лисичку локально в PixiJS прямо во время переноса для живой физики
+            // 🔥 ФИКС ЛОВУШКИ 1: Округление масштаба через Math.round внутри мыши
+            let rawScale = (window.kitsuChatState.currentZoomPercent || 70) / 100;
+            let currentScaleFloat = Math.round((rawScale + Number.EPSILON) * 100) / 100;
+            
             let cx = finalLeft;
             let cy = finalTop;
             let foxTargetX = cx + 320 + 141;
             let foxTargetY = cy - 40 + 216;
-            let currentScaleFloat = Number(Math.round((window.kitsuChatState.currentZoomPercent || 70) / 100 + 'e2') + 'e-2');
             
             if (typeof window.setAvatarModelPositionAndScale === "function") {
                 window.setAvatarModelPositionAndScale(foxTargetX, foxTargetY, currentScaleFloat);
@@ -185,11 +171,7 @@ window.adjustZoom = function(directionStep) {
                 isDragging = false;
                 console.log("DRAG_STOP");
                 
-                // 🔥 АНТИ-МУСОРНЫЙ ТАЙМАУТ: 
-                // Выдерживаем паузу в 50мс, полностью вычищая застрявшие кадры mousemove,
-                // и запускаем Костяшку 4 фиксации Лисы и маски QRegion!
                 setTimeout(() => {
-                    console.log("[КАСКАД JS] -> Шаг 3: Карантин завершен. Запускаем Костяшку 4...");
                     if (window.updateKitsuAvatarPosition) window.updateKitsuAvatarPosition();
                 }, 50);
             }
@@ -197,7 +179,7 @@ window.adjustZoom = function(directionStep) {
     });
 })();
 
-// Функции добавления сообщений (Оригинальные асинхронные)
+// Метод добавления облачек сообщений (оставляем без изменений)
 window.addMessageToWebChat = function(role, text, isPartial = false) {
     const webHistory = document.getElementById("web-chat-history");
     if (!webHistory) return;

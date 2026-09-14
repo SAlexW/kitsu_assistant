@@ -21,6 +21,11 @@ class CustomWebEnginePage(QWebEnginePage):
         self.parent_widget = parent_widget
 
     def javaScriptConsoleMessage(self, level, message, lineNumber, sourceID):
+        # 🔥 ТОТАЛЬНЫЙ РЕНТГЕН-РАДАР КОНСОЛИ CHROMIUM:
+        # Выводим ВООБЩЕ ВСЁ, что происходит внутри JavaScript, на экран батника!
+        # Это мгновенно вскроет скрытые ReferenceError, TypeError и битые пути файлов.
+        print(f"🌐 [БРАУЗЕР LOG] Линия {lineNumber} | {message}")
+
         if "LIPSYNC_TICK:" in message:
             main_win = self.parent_widget.parent()
             if main_win and self.parent_widget.model_ready:
@@ -49,7 +54,6 @@ class CustomWebEnginePage(QWebEnginePage):
             except: pass
             return
 
-        # СИГНАЛЫ ДРАГА: Убираем маску на время движения для идеальной плавности
         if "DRAG_START" in message:
             main_win = self.parent_widget.parent()
             if main_win:
@@ -65,7 +69,7 @@ class CustomWebEnginePage(QWebEnginePage):
                 print("[ПИТОН МАСКА]: Драг остановлен. Ожидаем чистый слепок от Костяшки 5.")
             return
 
-        # 🔥 БРОНЕБОЙНЫЙ ПЕРЕВОД КООРДИНАТ ИЗ ГЛОБАЛЬНЫХ В ЛОКАЛЬНЫЕ ДЛЯ QREGION
+        # Наложение маски QRegion Windows
         if "WINDOW_MASK:" in message:
             try:
                 raw_coords = message.replace("WINDOW_MASK:", "").split(":")
@@ -87,15 +91,12 @@ class CustomWebEnginePage(QWebEnginePage):
                     local_chat_pos = main_win.mapFromGlobal(QPoint(cx, cy))
                     local_model_pos = main_win.mapFromGlobal(QPoint(mx, my))
                     
-                    # Строим регионы осязаемости на основе ЧЕСТНЫХ и чистых локальных пикселей окна
                     chat_region = QRegion(local_chat_pos.x(), local_chat_pos.y(), cw, ch)
                     model_region = QRegion(local_model_pos.x(), local_model_pos.y(), mw, mh)
                     
-                    # Сохраняем эти чистые регионы в память главного окна для возврата после драга
                     main_win.last_valid_chat_region = chat_region
                     main_win.last_valid_model_region = model_region
                     
-                    # Накладываем объединенную маску Windows, только если прямо сейчас НЕ идет драг!
                     if not getattr(main_win, 'is_currently_dragging_ui', False):
                         main_win.setMask(chat_region.united(model_region))
                         
@@ -103,8 +104,13 @@ class CustomWebEnginePage(QWebEnginePage):
                 print(f"❌ [PY LOCAL setMask ERROR]: {e}")
             return
 
+        # 🔥 ОЧИЩЕННЫЙ СИГНАЛ ГОТОВНОСТИ (Фикс Ловушки 3):
+        # Больше не накладываем маску вслепую раньше времени! 
+        # Даем отработать таймеру ядра main_assistant.pyw для идеальной синхронизации.
         if "AVATAR_READY" in message:
+            print("[ПИТОН РАНТАЙМ]: Модель Кицунэ успешно загружена в WebGL. Ожидаем пусковой таймер ядра...")
             self.parent_widget.force_model_ready()
+            return
 
 class Live2DWidget(QWebEngineView):
     def __init__(self, parent=None, model_path="model/GothL2D.model3.json"):

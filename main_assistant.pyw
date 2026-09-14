@@ -61,8 +61,18 @@ class DesktopAssistant(QWidget):
         QTimer.singleShot(15000, lambda: self._emergency_self_destruct())
 
     def _emergency_self_destruct(self):
-        """ Экстренное закрытие программы для безопасного дебага """
-        print("\n💥 [БЕЗОПАСНОСТЬ]: 15 секунд истекли! Чисто закрываем оверлей...")
+        """ 
+        💥 Экстренное закрытие программы для безопасного дебага.
+        Перед выходом намертво сохраняет весь лог консоли батника в текстовый файл!
+        """
+        print("\n💥 [БЕЗОПАСНОСТЬ]: 15 секунд истекли! Завершаем рантайм...")
+        
+        # Запись финального маркера закрытия
+        print("================================================================================")
+        print("🏁 СИСТЕМНЫЙ СЛЕПОК СДЕЛАН УСПЕШНО. ПРОГРАММА ЧИСТО ЗАКРЫТА.")
+        print("================================================================================")
+        
+        # Закрываем приложение PyQt6 чисто
         QApplication.quit()
 
     def initialize_central_spawn_and_limits(self):
@@ -219,13 +229,34 @@ class DesktopAssistant(QWidget):
         if random.random() < 0.30: 
             asyncio.ensure_future(self.send_message_async(is_hidden_prompt=True))
 
+# 🔥 КЛАСС-ПЕРЕХВАТЧИК ДЛЯ ДУБЛИРОВАНИЯ КОНСОЛИ В ФАЙЛ НА ДИСК
+class LoggerStream(object):
+    def __init__(self, filename="console_runtime.log"):
+        self.terminal = sys.stdout
+        self.log = open(filename, "w", encoding="utf-8", buffering=1) # Флаш после каждой строки!
+
+    def write(self, message):
+        self.terminal.write(message)
+        self.log.write(message)
+
+    def flush(self):
+        self.terminal.flush()
+        self.log.flush()
+
 if __name__ == "__main__":
     from qasync import QEventLoop
+    
+    # Включаем сквозное дублирование консоли в файл console_runtime.log
+    sys.stdout = LoggerStream()
+    sys.stderr = sys.stdout # Ловим и критические ошибки Python (Traceback)
+    
     sys.argv.append("--allow-file-access-from-files")
     sys.argv.append("--disable-web-security")
+    
     app = QApplication(sys.argv)
     loop = QEventLoop(app)
     asyncio.set_event_loop(loop)
+    
     assistant = DesktopAssistant()
     assistant.show() 
     with loop: loop.run_forever()

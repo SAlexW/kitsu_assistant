@@ -1,0 +1,201 @@
+
+[ИИ МОЗГ] Запуск КИЦУНЭ на стабильном асинхронном рантайме...
+[ИИ МОЗГ] Инициализация локальной модели по пути: brain_model\model.gguf...
+llama_model_loader: loaded meta data with 33 key-value pairs and 292 tensors from brain_model\model.gguf (version GGUF V3 (latest))
+llama_model_loader: Dumping metadata keys/values. Note: KV overrides do not apply in this output.
+llama_model_loader: - kv   0:                       general.architecture str              = llama
+llama_model_loader: - kv   1:                               general.type str              = model
+llama_model_loader: - kv   2:                               general.name str              = Meta Llama 3.1 8b Instruct
+llama_model_loader: - kv   3:                       general.organization str              = Unsloth
+llama_model_loader: - kv   4:                           general.finetune str              = instruct
+llama_model_loader: - kv   5:                           general.basename str              = meta-llama-3.1
+llama_model_loader: - kv   6:                         general.size_label str              = 8B
+llama_model_loader: - kv   7:                            general.license str              = llama3.1
+llama_model_loader: - kv   8:                          llama.block_count u32              = 32
+llama_model_loader: - kv   9:                       llama.context_length u32              = 131072
+llama_model_loader: - kv  10:                     llama.embedding_length u32              = 4096
+llama_model_loader: - kv  11:                  llama.feed_forward_length u32              = 14336
+llama_model_loader: - kv  12:                 llama.attention.head_count u32              = 32
+llama_model_loader: - kv  13:              llama.attention.head_count_kv u32              = 8
+llama_model_loader: - kv  14:                       llama.rope.freq_base f32              = 500000.000000
+llama_model_loader: - kv  15:     llama.attention.layer_norm_rms_epsilon f32              = 0.000010
+llama_model_loader: - kv  16:                          general.file_type u32              = 15
+llama_model_loader: - kv  17:                           llama.vocab_size u32              = 128256
+llama_model_loader: - kv  18:                 llama.rope.dimension_count u32              = 128
+llama_model_loader: - kv  19:                       tokenizer.ggml.model str              = gpt2
+llama_model_loader: - kv  20:                         tokenizer.ggml.pre str              = llama-bpe
+llama_model_loader: - kv  21:                      tokenizer.ggml.tokens arr[str,128256]  = ["!", "\"", "#", "$", "%", "&", "'", ...
+llama_model_loader: - kv  22:                  tokenizer.ggml.token_type arr[i32,128256]  = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, ...
+llama_model_loader: - kv  23:                      tokenizer.ggml.merges arr[str,280147]  = ["Ġ Ġ", "Ġ ĠĠĠ", "ĠĠ ĠĠ", "...
+llama_model_loader: - kv  24:                tokenizer.ggml.bos_token_id u32              = 128000
+llama_model_loader: - kv  25:                tokenizer.ggml.eos_token_id u32              = 128009
+llama_model_loader: - kv  26:            tokenizer.ggml.padding_token_id u32              = 128004
+llama_model_loader: - kv  27:                    tokenizer.chat_template str              = {% set loop_messages = messages %}{% ...
+llama_model_loader: - kv  28:               general.quantization_version u32              = 2
+llama_model_loader: - kv  29:                      quantize.imatrix.file str              = /models_out/Llama-3.1-8B-Lexi-Uncenso...
+llama_model_loader: - kv  30:                   quantize.imatrix.dataset str              = /training_dir/calibration_datav3.txt
+llama_model_loader: - kv  31:             quantize.imatrix.entries_count i32              = 224
+llama_model_loader: - kv  32:              quantize.imatrix.chunks_count i32              = 125
+llama_model_loader: - type  f32:   66 tensors
+llama_model_loader: - type q8_0:    2 tensors
+llama_model_loader: - type q4_K:  192 tensors
+llama_model_loader: - type q6_K:   32 tensors
+llm_load_vocab: special tokens cache size = 256
+llm_load_vocab: token to piece cache size = 0.7999 MB
+llm_load_print_meta: format           = GGUF V3 (latest)
+llm_load_print_meta: arch             = llama
+llm_load_print_meta: vocab type       = BPE
+llm_load_print_meta: n_vocab          = 128256
+llm_load_print_meta: n_merges         = 280147
+llm_load_print_meta: vocab_only       = 0
+llm_load_print_meta: n_ctx_train      = 131072
+llm_load_print_meta: n_embd           = 4096
+llm_load_print_meta: n_layer          = 32
+llm_load_print_meta: n_head           = 32
+llm_load_print_meta: n_head_kv        = 8
+llm_load_print_meta: n_rot            = 128
+llm_load_print_meta: n_swa            = 0
+llm_load_print_meta: n_embd_head_k    = 128
+llm_load_print_meta: n_embd_head_v    = 128
+llm_load_print_meta: n_gqa            = 4
+llm_load_print_meta: n_embd_k_gqa     = 1024
+llm_load_print_meta: n_embd_v_gqa     = 1024
+llm_load_print_meta: f_norm_eps       = 0.0e+00
+llm_load_print_meta: f_norm_rms_eps   = 1.0e-05
+llm_load_print_meta: f_clamp_kqv      = 0.0e+00
+llm_load_print_meta: f_max_alibi_bias = 0.0e+00
+llm_load_print_meta: f_logit_scale    = 0.0e+00
+llm_load_print_meta: n_ff             = 14336
+llm_load_print_meta: n_expert         = 0
+llm_load_print_meta: n_expert_used    = 0
+llm_load_print_meta: causal attn      = 1
+llm_load_print_meta: pooling type     = 0
+llm_load_print_meta: rope type        = 0
+llm_load_print_meta: rope scaling     = linear
+llm_load_print_meta: freq_base_train  = 500000.0
+llm_load_print_meta: freq_scale_train = 1
+llm_load_print_meta: n_ctx_orig_yarn  = 131072
+llm_load_print_meta: rope_finetuned   = unknown
+llm_load_print_meta: ssm_d_conv       = 0
+llm_load_print_meta: ssm_d_inner      = 0
+llm_load_print_meta: ssm_d_state      = 0
+llm_load_print_meta: ssm_dt_rank      = 0
+llm_load_print_meta: ssm_dt_b_c_rms   = 0
+llm_load_print_meta: model type       = 8B
+llm_load_print_meta: model ftype      = Q4_K - Medium
+llm_load_print_meta: model params     = 8.03 B
+llm_load_print_meta: model size       = 4.94 GiB (5.28 BPW) 
+llm_load_print_meta: general.name     = Meta Llama 3.1 8b Instruct
+llm_load_print_meta: BOS token        = 128000 '<|begin_of_text|>'
+llm_load_print_meta: EOS token        = 128009 '<|eot_id|>'
+llm_load_print_meta: PAD token        = 128004 '<|finetune_right_pad_id|>'
+llm_load_print_meta: LF token         = 128 'Ä'
+llm_load_print_meta: EOT token        = 128009 '<|eot_id|>'
+llm_load_print_meta: max token length = 256
+llm_load_tensors: ggml ctx size =    0.14 MiB
+llm_load_tensors:        CPU buffer size =  5057.14 MiB
+.................................................................................
+llama_new_context_with_model: n_ctx      = 2048
+llama_new_context_with_model: n_batch    = 512
+llama_new_context_with_model: n_ubatch   = 512
+llama_new_context_with_model: flash_attn = 0
+llama_new_context_with_model: freq_base  = 500000.0
+llama_new_context_with_model: freq_scale = 1
+llama_kv_cache_init:        CPU KV buffer size =   256.00 MiB
+llama_new_context_with_model: KV self size  =  256.00 MiB, K (f16):  128.00 MiB, V (f16):  128.00 MiB
+llama_new_context_with_model:        CPU  output buffer size =     0.49 MiB
+llama_new_context_with_model:        CPU compute buffer size =   258.50 MiB
+llama_new_context_with_model: graph nodes  = 1030
+llama_new_context_with_model: graph splits = 1
+AVX = 1 | AVX_VNNI = 0 | AVX2 = 1 | AVX512 = 0 | AVX512_VBMI = 0 | AVX512_VNNI = 0 | AVX512_BF16 = 0 | FMA = 1 | NEON = 0 | SVE = 0 | ARM_FMA = 0 | F16C = 1 | FP16_VA = 0 | WASM_SIMD = 0 | BLAS = 0 | SSE3 = 1 | SSSE3 = 1 | VSX = 0 | MATMUL_INT8 = 0 | LLAMAFILE = 1 | 
+Model metadata: {'general.name': 'Meta Llama 3.1 8b Instruct', 'general.architecture': 'llama', 'general.type': 'model', 'llama.context_length': '131072', 'general.organization': 'Unsloth', 'general.basename': 'meta-llama-3.1', 'general.finetune': 'instruct', 'general.size_label': '8B', 'general.license': 'llama3.1', 'llama.block_count': '32', 'llama.embedding_length': '4096', 'llama.feed_forward_length': '14336', 'llama.attention.head_count': '32', 'tokenizer.ggml.eos_token_id': '128009', 'general.file_type': '15', 'llama.attention.head_count_kv': '8', 'llama.rope.freq_base': '500000.000000', 'quantize.imatrix.entries_count': '224', 'llama.attention.layer_norm_rms_epsilon': '0.000010', 'llama.vocab_size': '128256', 'llama.rope.dimension_count': '128', 'tokenizer.ggml.model': 'gpt2', 'tokenizer.ggml.pre': 'llama-bpe', 'general.quantization_version': '2', 'tokenizer.ggml.bos_token_id': '128000', 'tokenizer.ggml.padding_token_id': '128004', 'tokenizer.chat_template': "{% set loop_messages = messages %}{% for message in loop_messages %}{% set content = '<|start_header_id|>' + message['role'] + '<|end_header_id|>\n\n'+ message['content'] | trim + '<|eot_id|>' %}{% if loop.index0 == 0 %}{% set content = bos_token + content %}{% endif %}{{ content }}{% endfor %}{{ '<|start_header_id|>assistant<|end_header_id|>\n\n' }}", 'quantize.imatrix.chunks_count': '125', 'quantize.imatrix.file': '/models_out/Llama-3.1-8B-Lexi-Uncensored-GGUF/Llama-3.1-8B-Lexi-Uncensored.imatrix', 'quantize.imatrix.dataset': '/training_dir/calibration_datav3.txt'}
+Available chat formats from metadata: chat_template.default
+Using gguf chat template: {% set loop_messages = messages %}{% for message in loop_messages %}{% set content = '<|start_header_id|>' + message['role'] + '<|end_header_id|>
+
+'+ message['content'] | trim + '<|eot_id|>' %}{% if loop.index0 == 0 %}{% set content = bos_token + content %}{% endif %}{{ content }}{% endfor %}{{ '<|start_header_id|>assistant<|end_header_id|>
+
+' }}
+Using chat eos_token: <|eot_id|>
+Using chat bos_token: <|begin_of_text|>
+[ИИ МОЗГ] Локальный разум КИЦУНЭ успешно развернут в видеопамяти GPU!
+Кастомный звук загружен!
+[БЕЗОПАСНОСТЬ] Взведен 15-секундный таймер экстренного самоотключения...
+🌐 [БРАУЗЕР LOG] Линия 2 | Live2D %s 2.1.00_1
+🌐 [БРАУЗЕР LOG] Линия 2 | profile : Desktop
+🌐 [БРАУЗЕР LOG] Линия 2 |   [PROFILE_NAME] = Desktop
+🌐 [БРАУЗЕР LOG] Линия 2 |   [USE_ADJUST_TRANSLATION] = false
+🌐 [БРАУЗЕР LOG] Линия 2 |   [USE_CACHED_POLYGON_IMAGE] = false
+🌐 [БРАУЗЕР LOG] Линия 2 |   [EXPAND_W] = 2
+🌐 [БРАУЗЕР LOG] Линия 2 | [JS ENGINE] Каскадный движок домино запущен!
+🌐 [БРАУЗЕР LOG] Линия 2 | [JS MODULE] Выделенный модуль эмоций и маскировки успешно подключен!
+🌐 [БРАУЗЕР LOG] Линия 25 | [CONFIG_SYNC]:{"avatar_settings":{"native_model_height":2787,"native_model_width":2300,"center_vector_x":200,"scale_screen_percent":0.4},"chat_settings":{"width":430,"height":200,"input_height":35},"app_settings":{"total_width":650,"total_height":500},"interact_settings":{"tick_interval_ms":700,"hold_threshold_px":5,"stroke_threshold_px":18}}
+🌐 [БРАУЗЕР LOG] Линия 8 | 
+ %c %c %c PixiJS 5.3.12 - ✰ WebGL 2 ✰  %c  %c  http://www.pixijs.com/  %c %c ♥%c♥%c♥ 
+
+ background: #ff66a5; padding:5px 0; background: #ff66a5; padding:5px 0; color: #ff66a5; background: #030307; padding:5px 0; background: #ff66a5; padding:5px 0; background: #ffc3dc; padding:5px 0; background: #ff66a5; padding:5px 0; color: #ff2424; background: #fff; padding:5px 0; color: #ff2424; background: #fff; padding:5px 0; color: #ff2424; background: #fff; padding:5px 0;
+🌐 [БРАУЗЕР LOG] Линия 1 | [CSM][I]Live2D Cubism Core version: 04.00.0000 (67108864)
+
+🌐 [БРАУЗЕР LOG] Линия 1 | [CSM][I]CubismFramework.startUp() is complete.
+
+🌐 [БРАУЗЕР LOG] Линия 1 | [CSM][I]CubismFramework.initialize() is complete.
+
+🌐 [БРАУЗЕР LOG] Линия 9 | Live2D Cubism SDK Core Version 4.0.0
+🌐 [БРАУЗЕР LOG] Линия 98 | AVATAR_READY
+[ПИТОН РАНТАЙМ]: Модель Кицунэ успешно загружена в WebGL. Ожидаем пусковой таймер ядра...
+🌐 [БРАУЗЕР LOG] Линия 6 | [ГЕОМЕТРИЯ ЯДРА] >>> Вызван автоматический пересчет масштаба Лисички.
+🌐 [БРАУЗЕР LOG] Линия 21 | [ГЕОМЕТРИЯ ЯДРА]: Масштаб модели успешно зафиксирован на значении: 0.7
+🌐 [БРАУЗЕР LOG] Линия 50 | [ГЕОМЕТРИЯ ЯДРА]: Координаты Лисички синхронизированы с чатом: 1181x541
+🌐 [БРАУЗЕР LOG] Линия 37 | [AVATAR_HOVER]:FALSE
+[ГЕОМЕТРИЯ СИСТЕМЫ]: Рабочая зона Windows зафиксирована: {'left': 0, 'top': 0, 'right': 1440, 'bottom': 860}
+🌐 [БРАУЗЕР LOG] Линия 1 | [ПИТОН ВЕКТОР]: Лимиты Windows переданы в JS.
+🌐 [БРАУЗЕР LOG] Линия 25 | WINDOW_MASK:720:365:480:350:1040:325:282:432
+[БОЕВАЯ БАЗА] Из chat_history_v3 выгружено 10 сообщений.
+🌐 [БРАУЗЕР LOG] Линия 70 | [ИИ-ВЗГЛЯД] Резкое движение! Кицунэ переключила внимание на курсор.
+🌐 [БРАУЗЕР LOG] Линия 37 | [AVATAR_HOVER]:TRUE
+🌐 [БРАУЗЕР LOG] Линия 102 | DRAG_START
+[ПИТОН МАСКА]: Драг начат. Окно временно открыто целиком для шёлкового хода.
+🌐 [БРАУЗЕР LOG] Линия 129 | WINDOW_MASK_CLEAR
+🌐 [БРАУЗЕР LOG] Линия 6 | [ГЕОМЕТРИЯ ЯДРА] >>> Вызван автоматический пересчет масштаба Лисички.
+🌐 [БРАУЗЕР LOG] Линия 21 | [ГЕОМЕТРИЯ ЯДРА]: Масштаб модели успешно зафиксирован на значении: 0.7
+🌐 [БРАУЗЕР LOG] Линия 50 | [ГЕОМЕТРИЯ ЯДРА]: Координаты Лисички синхронизированы с чатом: 1181x541
+🌐 [БРАУЗЕР LOG] Линия 6 | [ГЕОМЕТРИЯ ЯДРА] >>> Вызван автоматический пересчет масштаба Лисички.
+🌐 [БРАУЗЕР LOG] Линия 21 | [ГЕОМЕТРИЯ ЯДРА]: Масштаб модели успешно зафиксирован на значении: 0.7
+🌐 [БРАУЗЕР LOG] Линия 50 | [ГЕОМЕТРИЯ ЯДРА]: Координаты Лисички синхронизированы с чатом: 1181x541
+🌐 [БРАУЗЕР LOG] Линия 6 | [ГЕОМЕТРИЯ ЯДРА] >>> Вызван автоматический пересчет масштаба Лисички.
+🌐 [БРАУЗЕР LOG] Линия 21 | [ГЕОМЕТРИЯ ЯДРА]: Масштаб модели успешно зафиксирован на значении: 0.7
+🌐 [БРАУЗЕР LOG] Линия 50 | [ГЕОМЕТРИЯ ЯДРА]: Координаты Лисички синхронизированы с чатом: 1181x541
+🌐 [БРАУЗЕР LOG] Линия 6 | [ГЕОМЕТРИЯ ЯДРА] >>> Вызван автоматический пересчет масштаба Лисички.
+🌐 [БРАУЗЕР LOG] Линия 21 | [ГЕОМЕТРИЯ ЯДРА]: Масштаб модели успешно зафиксирован на значении: 0.7
+🌐 [БРАУЗЕР LOG] Линия 50 | [ГЕОМЕТРИЯ ЯДРА]: Координаты Лисички синхронизированы с чатом: 1181x541
+🌐 [БРАУЗЕР LOG] Линия 6 | [ГЕОМЕТРИЯ ЯДРА] >>> Вызван автоматический пересчет масштаба Лисички.
+🌐 [БРАУЗЕР LOG] Линия 21 | [ГЕОМЕТРИЯ ЯДРА]: Масштаб модели успешно зафиксирован на значении: 0.7
+🌐 [БРАУЗЕР LOG] Линия 50 | [ГЕОМЕТРИЯ ЯДРА]: Координаты Лисички синхронизированы с чатом: 1181x541
+🌐 [БРАУЗЕР LOG] Линия 6 | [ГЕОМЕТРИЯ ЯДРА] >>> Вызван автоматический пересчет масштаба Лисички.
+🌐 [БРАУЗЕР LOG] Линия 21 | [ГЕОМЕТРИЯ ЯДРА]: Масштаб модели успешно зафиксирован на значении: 0.7
+🌐 [БРАУЗЕР LOG] Линия 50 | [ГЕОМЕТРИЯ ЯДРА]: Координаты Лисички синхронизированы с чатом: 1181x541
+🌐 [БРАУЗЕР LOG] Линия 6 | [ГЕОМЕТРИЯ ЯДРА] >>> Вызван автоматический пересчет масштаба Лисички.
+🌐 [БРАУЗЕР LOG] Линия 21 | [ГЕОМЕТРИЯ ЯДРА]: Масштаб модели успешно зафиксирован на значении: 0.7
+🌐 [БРАУЗЕР LOG] Линия 50 | [ГЕОМЕТРИЯ ЯДРА]: Координаты Лисички синхронизированы с чатом: 1181x541
+🌐 [БРАУЗЕР LOG] Линия 6 | [ГЕОМЕТРИЯ ЯДРА] >>> Вызван автоматический пересчет масштаба Лисички.
+🌐 [БРАУЗЕР LOG] Линия 21 | [ГЕОМЕТРИЯ ЯДРА]: Масштаб модели успешно зафиксирован на значении: 0.7
+🌐 [БРАУЗЕР LOG] Линия 50 | [ГЕОМЕТРИЯ ЯДРА]: Координаты Лисички синхронизированы с чатом: 1181x541
+🌐 [БРАУЗЕР LOG] Линия 6 | [ГЕОМЕТРИЯ ЯДРА] >>> Вызван автоматический пересчет масштаба Лисички.
+🌐 [БРАУЗЕР LOG] Линия 21 | [ГЕОМЕТРИЯ ЯДРА]: Масштаб модели успешно зафиксирован на значении: 0.7
+🌐 [БРАУЗЕР LOG] Линия 50 | [ГЕОМЕТРИЯ ЯДРА]: Координаты Лисички синхронизированы с чатом: 1181x541
+🌐 [БРАУЗЕР LOG] Линия 6 | [ГЕОМЕТРИЯ ЯДРА] >>> Вызван автоматический пересчет масштаба Лисички.
+🌐 [БРАУЗЕР LOG] Линия 21 | [ГЕОМЕТРИЯ ЯДРА]: Масштаб модели успешно зафиксирован на значении: 0.7
+🌐 [БРАУЗЕР LOG] Линия 50 | [ГЕОМЕТРИЯ ЯДРА]: Координаты Лисички синхронизированы с чатом: 1181x541
+🌐 [БРАУЗЕР LOG] Линия 6 | [ГЕОМЕТРИЯ ЯДРА] >>> Вызван автоматический пересчет масштаба Лисички.
+🌐 [БРАУЗЕР LOG] Линия 21 | [ГЕОМЕТРИЯ ЯДРА]: Масштаб модели успешно зафиксирован на значении: 0.7
+🌐 [БРАУЗЕР LOG] Линия 50 | [ГЕОМЕТРИЯ ЯДРА]: Координаты Лисички синхронизированы с чатом: 1181x541
+🌐 [БРАУЗЕР LOG] Линия 172 | DRAG_STOP
+[ПИТОН МАСКА]: Драг остановлен. Ожидаем чистый слепок от Костяшки 5.
+🌐 [БРАУЗЕР LOG] Линия 6 | [ГЕОМЕТРИЯ ЯДРА] >>> Вызван автоматический пересчет масштаба Лисички.
+🌐 [БРАУЗЕР LOG] Линия 21 | [ГЕОМЕТРИЯ ЯДРА]: Масштаб модели успешно зафиксирован на значении: 0.7
+🌐 [БРАУЗЕР LOG] Линия 50 | [ГЕОМЕТРИЯ ЯДРА]: Координаты Лисички синхронизированы с чатом: 1181x541
+🌐 [БРАУЗЕР LOG] Линия 25 | WINDOW_MASK:720:365:480:350:1040:325:282:432
+
+💥 [БЕЗОПАСНОСТЬ]: 15 секунд истекли! Завершаем рантайм...
+================================================================================
+🏁 СИСТЕМНЫЙ СЛЕПОК СДЕЛАН УСПЕШНО. ПРОГРАММА ЧИСТО ЗАКРЫТА.
+================================================================================
