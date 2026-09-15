@@ -76,26 +76,50 @@ class DesktopAssistant(QWidget):
         QApplication.quit()
 
     def initialize_central_spawn_and_limits(self):
-        """ 🔥 КОСТЯШКА 1: Опрос рабочей зоны Windows и передача её в JavaScript """
+        """ 🔥 ТВОЙ АЛГОРИТМ МОНОЛИТНОГО ИНЖЕКТА CONFIG.JSON И ЭКРАННЫХ ЛИМИТОВ """
+        import json
+        from PyQt6.QtGui import QCursor
+        from PyQt6.QtWidgets import QApplication
+        
         current_screen = QApplication.screenAt(QCursor.pos()) if QApplication.screenAt(QCursor.pos()) else QApplication.primaryScreen()
         work_geo = current_screen.availableGeometry()
         
-        # Сохраняем чистые лимиты свободной зоны экрана (с вычетом панели задач)
+        # 1. Читаем живые параметры масштаба прямо из config.json на жестком диске
+        config_zoom = 40  # Аварийный фоллбэк, если файл занят
+        try:
+            with open("config.json", "r", encoding="utf-8") as f:
+                cfg_data = json.load(f)
+                avatar_cfg = cfg_data.get("avatar_settings", {})
+                # Подхватываем твой параметр 0.40 и переводим в проценты (0.40 * 100 = 40)
+                config_zoom = int(avatar_cfg.get("scale_screen_percent", 0.40) * 100)
+        except Exception as e:
+            print(f"⚠️ [ПИТОН КОНФИГ ИНЖЕКТ ERROR]: Не удалось прочитать масштаб: {e}")
+
+        # 2. Фиксируем чистые лимиты свободной зоны экрана Windows
         self.work_limits = {
             "left": work_geo.x(),
             "top": work_geo.y(),
             "right": work_geo.x() + work_geo.width(),
             "bottom": work_geo.y() + work_geo.height()
         }
-        print(f"[ГЕОМЕТРИЯ СИСТЕМЫ]: Рабочая зона Windows зафиксирована: {self.work_limits}")
+        print(f"[ГЕОМЕТРИЯ СИСТЕМЫ]: Инжект в Chromium. Рабочая зона: {self.work_limits} | Масштаб конфига: {config_zoom}%")
         
-        # Передаем лимиты в глобальную память Chromium
-        import json
+        # 3. Стреляем ядрами параметров прямо в глобальную память Chromium!
+        # Мы принудительно выставляем в kitsuChatState тот самый масштаб, который ты указал в файле!
         limits_json = json.dumps(self.work_limits)
-        js_command = f"window.kitsuScreenLimits = {limits_json}; console.log('[ПИТОН ВЕКТОР]: Лимиты Windows переданы в JS.');"
+        js_command = f"""
+        (function() {{
+            window.kitsuScreenLimits = {limits_json};
+            if (!window.kitsuChatState) window.kitsuChatState = {{}};
+            window.kitsuChatState.currentZoomPercent = {config_zoom};
+            const zInp = document.getElementById('kitsu-zoom-value');
+            if (zInp) zInp.value = {config_zoom};
+            console.log('[ПИТОН МОСТ]: Параметры config.json успешно защелкнуты в память JS!');
+        }})();
+        """
         self.kitsu_avatar.page().runJavaScript(js_command)
         
-        # 🔥 ТОЛКАЕМ КОСТЯШКУ 4: Принудительно заставляем JS запустить каскад позиционирования и обрезки!
+        # Толкаем Костяшку 4: Запускаем каскад пересчета экранного масштаба и обрезки
         QTimer.singleShot(50, lambda: self.kitsu_avatar.page().runJavaScript("if(window.updateKitsuAvatarPosition) window.updateKitsuAvatarPosition();"))
 
     # ЧАСТЬ 2: КОНВЕЙЕР ГЕНЕРАЦИИ, СИНХРОНИЗАЦИЯ БАЗЫ И СТАРТ ЛУПА

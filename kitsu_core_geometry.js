@@ -1,71 +1,61 @@
-// kitsu_core_geometry.js — ТРАССИРОВОЧНЫЙ ЛОГГЕР ЖИЗНЕННОГО ЦИКЛА МОДЕЛИ
-console.log("🌐 [БРАУЗЕР LOG] Инициализацияkits_core_geometry.js запущена.");
+// kitsu_core_geometry.js — ЭКРАННЫЙ МАТЕМАТИЧЕСКИЙ МАСШТАБАТОР КИЦУНЭ
+console.log("🌐 [БРАУЗЕР LOG] Инициализацияkits_core_geometry.js с экраном 1440x900.");
 
 window.updateModelScaleAndPosition = function() {
-    if (!window.live2dModel) {
-        console.log("🌐 [БРАУЗЕР LOG] ❌ [КРИТИЧЕСКИЙ СБОЙ]: window.live2dModel еще не существует в памяти!");
-        return;
-    }
+    if (!window.live2dModel) return;
 
-    console.log("🌐 [БРАУЗЕР LOG] >>> [ШАГ 1]: Функция updateModelScaleAndPosition вызвана.");
-
-    // 1. Проверяем состояние нашего пульта зума
-    let targetZoomPercent = 70;
+    // 1. Считываем живые проценты зума из нашего пульта (по дефолту 70%)
+    let userZoomPercent = 70;
     if (window.kitsuChatState && window.kitsuChatState.currentZoomPercent) {
-        targetZoomPercent = window.kitsuChatState.currentZoomPercent;
-        console.log("🌐 [БРАУЗЕР LOG] [ШАГ 2]: Взят масштаб из kitsuChatState: " + targetZoomPercent + "%");
-    } else {
-        console.log("🌐 [БРАУЗЕР LOG] [ШАГ 2]: ВНИМАНИЕ: kitsuChatState не готов. Используем дефолт 70%.");
+        userZoomPercent = window.kitsuChatState.currentZoomPercent;
     }
 
-    // 2. Рассчитываем коэффициент масштабирования PixiJS
-    let finalScale = Number(Math.round(targetZoomPercent / 100 + 'e2') + 'e-2');
-    
-    // 🔥 БРОНЕБОЙНАЯ ЗАЩИТА ОТ ВЕЛИКАНА (Фикс перекрытия чата):
-    // Если по каким-то причинам масштаб получился нулевым, ломаным или нативным (1.0),
-    // мы насильно срезаем его до безопасного адаптивного коэффициента 0.18, 
-    // чтобы гигантское полотно физически не могло накрыть кнопки чата!
-    if (finalScale >= 1.0 || isNaN(finalScale) || finalScale <= 0) {
-        console.log("🌐 [БРАУЗЕР LOG] ⚠️ [МАСШТАБНЫЙ АЛАРМ]: Коэффициент равен " + finalScale + ". Защита активирована! Насильно выставляем сейв-лимит 0.18!");
-        finalScale = 0.18; 
-    }
+    // 2. 🔥 ТВОЯ ЭКРАННАЯ МАТЕМАТИКА (Фикс великана):
+    // Нативная высота меша Лисички от художника — 2787 пикселей.
+    // Живая высота рабочей зоны твоего монитора — 860 пикселей (из лога Windows).
+    let nativeModelHeight = 2787;
+    let windowHeight = (window.kitsuScreenLimits && window.kitsuScreenLimits.bottom) || 860;
 
-    // Применяем масштаб к модели
+    // Высчитываем, сколько пикселей на экране должна ЗАНИМАТЬ Лисичка согласно пульту зума
+    // Например: 860 * (70 / 100) = 602 пикселя высоты на экране!
+    let targetPixelHeight = windowHeight * (userZoomPercent / 100);
+
+    // Вычисляем ИСТИННЫЙ коэффициент масштабирования для PixiJS ядра:
+    // Делим целевые пиксели экрана на гигантские пиксели художника: 602 / 2787 = ~0.21!
+    let finalScale = targetPixelHeight / nativeModelHeight;
+
+    // Округляем до сотых долей для стабильности WebGL матриц
+    finalScale = Math.round((finalScale + Number.EPSILON) * 100) / 100;
+
+    // Предохранитель от критических сбоев
+    if (finalScale <= 0 || isNaN(finalScale)) finalScale = 0.18;
+
+    // Накладываем жестко рассчитанный коэффициент на модель
     window.live2dModel.scale.set(finalScale);
-    console.log("🌐 [БРАУЗЕР LOG] [ШАГ 3]: МАСШТАБ ПРИМЕНЕН К live2dModel: " + finalScale);
+    console.log("🌐 [БРАУЗЕР LOG] [ЭKРАННЫЙ ЗУМ УСПЕХ]: К live2dModel применен коэффициент: " + finalScale + " под высоту экрана " + windowHeight);
 
-    // Передаем ход позиционированию координат
+    // Передаем ход позиционированию координат на крыше чата
     if (typeof window.syncModelPositionWithChat === "function") {
         window.syncModelPositionWithChat();
-    } else {
-        console.log("🌐 [БРАУЗЕР LOG] ❌ [ОШИБКА]: Функция syncModelPositionWithChat отсутствует!");
     }
 };
 
-// Снайперская привязка к крыше чата
 window.syncModelPositionWithChat = function() {
     if (!window.live2dModel) return;
 
-    console.log("🌐 [БРАУЗЕР LOG] >>> [ШАГ 4]: Вызвана синхронизация координат syncModelPositionWithChat.");
-
     const chatContainer = document.getElementById("web-chat-container");
-    if (!chatContainer) {
-        console.log("🌐 [БРАУЗЕР LOG] ❌ [ОШИБКА]: #web-chat-container не найден в DOM дереве страницы!");
-        return;
-    }
+    if (!chatContainer) return;
 
     let cx = chatContainer.offsetLeft;
     let cy = chatContainer.offsetTop;
-    console.log("🌐 [БРАУЗЕР LOG] [ШАГ 5]: Физическая позиция чата в DOM: left=" + cx + ", top=" + cy);
 
-    // Сажаем Лисичку строго на правый угол крыши чата
+    // Сажаем Лисичку строго на правый угол крыши чата (Размеры маски 282x432)
     let foxTargetX = cx + 320 + 141;
     let foxTargetY = cy - 40 + 216;
 
     window.live2dModel.position.set(foxTargetX, foxTargetY);
     
     if (window.live2dModel.update) {
-        window.live2dModel.update(0.016);
+        window.live2dModel.update(0.016); // Включаем инерцию наклона
     }
-    console.log("🌐 [БРАУЗЕР LOG] ✅ [ШАГ 6]: ФИНАЛ. Моделька успешно посажена в координаты: " + foxTargetX + "x" + foxTargetY);
 };
