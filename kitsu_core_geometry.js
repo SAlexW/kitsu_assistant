@@ -1,65 +1,52 @@
 // kitsu_core_geometry.js — УНИВЕРСАЛЬНОЕ АЛГОРИТМИЧЕСКОЕ ЯДРО ГЕОМЕТРИИ
 console.log("🌐 [БРАУЗЕР LOG] Универсальное ядро геометрии Kitsune успешно запущено.");
 
-// 1. ФУНКЦИЯ МАСШТАБИРОВАНИЯ (Single Source of Truth для размеров)
+// 🔥 Глобальная функция нормализации масштаба (0.0 ... 1.0)
+window.normalizeKitsuScalePercent = function(rawVal) {
+    let num = parseFloat(rawVal);
+    if (isNaN(num)) num = 0.25;
+    // Если случайно передали 25 вместо 0.25 — переводим в 0.25
+    if (num > 1.0 && num <= 100.0) num = num / 100.0;
+    // Жесткое зажатие в диапазон [0.0, 1.0]
+    return Math.min(Math.max(num, 0.0), 1.0);
+};
+
+// 🔥 Применение математического масштаба от высоты экрана
 window.kitsuApplyScale = function(zoomPercent) {
     if (!window.live2dModel) return;
 
-    console.log("🌐 [БРАУЗЕР LOG] >>> [МАСШТАБАТОР]: Вызвана функция kitsuApplyScale на " + zoomPercent + "%");
+    // 1. Приводим к строгому диапазону 0.0 - 1.0
+    const scaleFactor = window.normalizeKitsuScalePercent(zoomPercent);
+    window.kitsuCurrentZoomFloat = scaleFactor; // Сохраняем истинный дробный масштаб
 
-    // Жесткий аварийный дефолт по ТЗ — 40% от экрана, если параметры не переданы
-    let targetPercent = zoomPercent || 40;
-    
-    // Нативная высота меша и живая высота экрана от Windows (твои 860px)
-    let nativeModelHeight = 2787;
-    let windowHeight = (window.kitsuScreenLimits && window.kitsuScreenLimits.bottom) || 860;
+    // 2. Получаем геометрию рабочего стола и модели
+    const desktopHeight = window.configData?.app_settings?.total_height || window.innerHeight || 860;
+    const nativeModelHeight = window.configData?.avatar_settings?.native_model_height || 2787.0;
 
-    // Рассчитываем, сколько целевых пикселей экрана должна занимать модель
-    let targetPixelHeight = windowHeight * (targetPercent / 100);
+    // 3. Формула: (Высота Экрана * Коэффициент) / Нативный Рост
+    const finalScale = (desktopHeight * scaleFactor) / nativeModelHeight;
 
-    // Вычисляем ИСТИННЫЙ коэффициент масштабирования для PixiJS
-    let finalScale = targetPixelHeight / nativeModelHeight;
-    finalScale = Math.round((finalScale + Number.EPSILON) * 100) / 100;
-
-    // Защитный Clamp предохранитель
-    if (finalScale <= 0 || isNaN(finalScale)) finalScale = 0.18;
-
-    // Применяем масштаб к модели один раз намертво!
+    // 4. Применяем только математический finalScale (никаких прямых 0.30!)
     window.live2dModel.scale.set(finalScale);
-    console.log("🌐 [БРАУЗЕР LOG] [ЯДРО МАСШТАБА]: Коэффициент " + finalScale + " успешно применен к live2dModel.");
 
-    // Вешаем функциональный замок: перезаписываем настройки плагина, чтобы ядро не бунтовало
-    if (window.kitsuConfig && window.kitsuConfig.avatar_settings) {
-        window.kitsuConfig.avatar_settings.native_model_height = nativeModelHeight;
-        window.kitsuConfig.avatar_settings.scale_screen_percent = finalScale;
-    }
-
-    // После изменения роста — принудительно вызываем чистый сдвиг координат!
-    window.kitsuApplyPosition();
+    console.log(`[ЯДРО МАСШТАБА]: Коэффициент экрана ${scaleFactor} (${Math.round(scaleFactor * 100)}%) -> finalScale: ${finalScale.toFixed(4)}`);
 };
 
-// 2. ФУНКЦИЯ ПОЗИЦИОНИРОВАНИЯ (Лёгкий и сверхбыстрый сдвиг по осям)
+// 🔥 Позиционирование модели относительно чата (БЕЗ ВЫЗОВА kitsuApplyScale!)
 window.kitsuApplyPosition = function() {
     if (!window.live2dModel) return;
-
-    const chatContainer = document.getElementById("web-chat-container");
+    const chatContainer = document.getElementById("main-chat-container") || document.querySelector(".chat-container");
     if (!chatContainer) return;
 
-    // Снимаем точнейшие физические координаты чата на экране
-    const chatRect = chatContainer.getBoundingClientRect();
-    let cx = Math.round(chatRect.left);
-    let cy = Math.round(chatRect.top);
-
-    // Сажаем Лисичку строго на правый угол крыши чата (Смещение anchor 0.5)
-    let foxTargetX = cx + 320 + 141;
-    let foxTargetY = cy - 40 + 216;
-
-    // Мгновенно переставляем модель внутри сцены PixiJS без лишних вычислений масштаба!
-    window.live2dModel.position.set(foxTargetX, foxTargetY);
+    const rect = chatContainer.getBoundingClientRect();
     
-    if (window.live2dModel.update) {
-        window.live2dModel.update(0.016); // Прокачиваем физику наклона
-    }
+    // Смещение Лисички к правому верхнему углу чата
+    const offsetX = window.configData?.avatar_settings?.center_vector_x || 320;
+    const offsetY = -40;
+
+    // Привязываем X и Y строго к живым координатам чата
+    window.live2dModel.x = rect.left + offsetX;
+    window.live2dModel.y = rect.top + offsetY;
 };
 
 // Оставляем оригинальное имя функции для совместимости со старыми вызовами ядра,

@@ -20,32 +20,38 @@ window.setAdvancedLipsync = function(openY, formX) {
 
 window.loadConfigAndStart = async function() {
     try {
-        const response = await fetch('config.json');
+        // Загрузка с обходом кэша браузера
+        const response = await fetch('config.json?v=' + Date.now());
         window.configData = await response.json();
-        console.log("[CONFIG_SYNC]:" + JSON.stringify(window.configData));
+        console.log("[CONFIG_SYNC]: Настройки загружены:", JSON.stringify(window.configData));
         
         if (typeof window.applyWebChatStyles === "function") {
             window.applyWebChatStyles(window.configData.chat_settings);
         }
-		
-        const initialPercent = Math.round((window.configData.avatar_settings?.scale_screen_percent || 0.40) * 100);
-        const zoomInput = document.getElementById("zoom-input-field");
+        
+        // Нормализация значения scale_screen_percent (0.0 ... 1.0)
+        const rawScale = window.configData.avatar_settings?.scale_screen_percent;
+        const normalizedScale = window.normalizeKitsuScalePercent(rawScale);
+        window.kitsuCurrentZoomFloat = normalizedScale;
+
+        // На пульт выводим целочисленные проценты (например, 30)
+        const displayPercent = Math.round(normalizedScale * 100);
+        const zoomInput = document.getElementById("zoom-input-field") || document.getElementById("kitsu-zoom-input");
         if (zoomInput) {
-            zoomInput.value = initialPercent;
-        }        
+            zoomInput.value = displayPercent;
+        }
+
         if (typeof window.initLive2D === "function") {
             window.initLive2D();
         }
     } catch (err) {
-        console.warn("⚠️ Применены дефолтные настройки:", err);
+        console.warn("⚠️ Ошибка загрузки config.json, фоллбэк:", err);
         window.configData = {
-            "avatar_settings": { "native_model_height": 2787.0, "native_model_width": 2300.0, "center_vector_x": 200, "scale_screen_percent": 0.40 },
-            "chat_settings": { "width": 430, "height": 200, "input_height": 35 },
-            "app_settings": { "total_width": 900, "total_height": 700 }
+            "avatar_settings": { "native_model_height": 2787.0, "native_model_width": 2300.0, "center_vector_x": 320, "scale_screen_percent": 0.25 },
+            "chat_settings": { "width": 480, "height": 350, "input_height": 35 },
+            "app_settings": { "total_width": 1920, "total_height": 1080 }
         };
+        window.kitsuCurrentZoomFloat = 0.25;
         if (typeof window.initLive2D === "function") { window.initLive2D(); }
-        if (typeof window.applyWebChatStyles === "function") { window.applyWebChatStyles(window.configData.chat_settings); }
-        const zoomInput = document.getElementById("zoom-input-field");
-        if (zoomInput) zoomInput.value = 40;
     }
 };

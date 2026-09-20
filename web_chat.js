@@ -26,58 +26,38 @@ window.syncRealRegionsToPython = function() {
 };
 
 // КОСТЯШКА 4: Синхронное позиционирование Лисички и ожидание кадра
-window.updateKitsuAvatarPosition = function() {
-    const chatContainer = document.getElementById("web-chat-container");
-    if (!chatContainer) return;
-
-    let cx = chatContainer.offsetLeft;
-    let cy = chatContainer.offsetTop;
-
-    let foxTargetX = cx + 320 + 141; 
-    let foxTargetY = cy - 40 + 216;  
-
-    // 🔥 ИСПРАВЛЕНИЕ ЛОВУШКИ 1: Заменили round на нативный Math.round! Ошибка исчезла!
-    let rawScale = (window.kitsuChatState.currentZoomPercent || 70) / 100;
-    let currentScaleFloat = Math.round((rawScale + Number.EPSILON) * 100) / 100;
-
-    if (typeof window.setAvatarModelPositionAndScale === "function") {
-        window.setAvatarModelPositionAndScale(foxTargetX, foxTargetY, currentScaleFloat);
+function updateKitsuAvatarPosition() {
+    // Вызываем единую позиционную функцию из kitsu_core_geometry.js
+    if (typeof window.kitsuApplyPosition === 'function') {
+        window.kitsuApplyPosition();
+    } else if (typeof window.syncModelPositionWithChat === 'function') {
+        window.syncModelPositionWithChat();
     }
 
-    requestAnimationFrame(() => {
-        window.syncRealRegionsToPython();
-    });
-};
+    // Синхронизируем маску оверлея Qt (QRegion) с Python
+    syncRealRegionsToPython();
+}
 
 // РЕГУЛИРОВКА КРАТНОГО ЗУМА (Иерархия кадров)
-window.adjustZoom = function(directionStep) {
-    const zoomInput = document.getElementById("kitsu-zoom-value");
+function adjustZoom(directionStep) {
+
+    let zoomInput = document.getElementById('kitsu-zoom-input');
     if (!zoomInput) return;
 
-    let oldZoom = window.kitsuChatState.currentZoomPercent;
-    let currentZoom = oldZoom;
+    let currentVal = parseInt(zoomInput.value) || 70;
+    let newVal = currentVal + directionStep;
 
-    if (directionStep > 0) {
-        let remainder = currentZoom % 5;
-        currentZoom = (remainder === 0) ? currentZoom + 5 : Math.floor(currentZoom / 5) * 5 + 5;
-    } else {
-        let remainder = currentZoom % 5;
-        currentZoom = (remainder === 0) ? currentZoom - 5 : Math.floor(currentZoom / 5) * 5;
+    // Границы масштабирования (10% - 200%)
+    newVal = Math.max(10, Math.min(200, newVal));
+    zoomInput.value = newVal;
+
+    // Вызываем единый расчёт масштаба из kitsu_core_geometry.js
+    if (typeof window.kitsuApplyScale === 'function') {
+        window.kitsuApplyScale(newVal);
+    } else if (typeof window.updateModelScaleAndPosition === 'function') {
+        window.updateModelScaleAndPosition(newVal);
     }
-
-    if (currentZoom < 10) currentZoom = 10;
-    if (currentZoom > 200) currentZoom = 200;
-
-    window.kitsuChatState.currentZoomPercent = currentZoom;
-    zoomInput.value = currentZoom;
-
-    if (currentZoom > oldZoom) {
-        window.syncRealRegionsToPython(); 
-        setTimeout(window.updateKitsuAvatarPosition, 30);
-    } else {
-        setTimeout(window.updateKitsuAvatarPosition, 40);
-    }
-};
+}
 
 // 🔥 ЧАСТЬ 2: ЧИСТЫЙ DELTA-ТРАНСЛЯТОР С КЛЭМПОМ И МЕССЕНДЖЕР
 (function() {

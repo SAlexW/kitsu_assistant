@@ -97,11 +97,26 @@
                     window.isLoaded = true;
                     console.log("AVATAR_READY");
 
-                    // Подгоняем масштаб и позицию Кицунэ над чатом
-                    if (typeof window.updateModelScaleAndPosition === "function") {
-                        window.updateModelScaleAndPosition();
-                    }
-
+					// 🔥 ПРИМЕНЕНИЕ ИСТИННОГО МАСШТАБА И ПОЗИЦИИ
+					if (typeof window.kitsuApplyScale === "function") {
+						let zoomInput = document.getElementById('zoom-input-field') || document.getElementById('kitsu-zoom-input');
+						let currentZoom = window.kitsuCurrentZoom || (zoomInput ? parseInt(zoomInput.value) : 25) || 25;
+						
+						// Фиксируем единый масштаб
+						window.kitsuCurrentZoom = currentZoom;
+						window.kitsuApplyScale(currentZoom);
+					} else if (typeof window.updateModelScaleAndPosition === "function") {
+						window.updateModelScaleAndPosition();
+					}
+		
+					if (typeof window.kitsuApplyPosition === "function") {
+						window.kitsuApplyPosition();
+					}
+					if (typeof window.syncRealRegionsToPython === "function") {
+						requestAnimationFrame(() => {
+							window.syncRealRegionsToPython();
+						});
+					}
                     // Инжектируем анатомические хит-зоны (Head, Ears, Intimate, Tail) в Cubism
                     if (typeof window.injectKitsuHitAreas === "function") {
                         window.injectKitsuHitAreas(model);
